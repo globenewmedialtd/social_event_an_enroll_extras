@@ -1,0 +1,116 @@
+<?php
+
+/**
+ * @file
+ * Contains social_event_an_enroll_extras.module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Locale\CountryManager;
+
+/**
+ * Implements hook_entity_type_build().
+ */
+function social_event_an_enroll_extras_entity_type_build(array &$entity_types) {
+  /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
+  //$entity_types['event_enrollment']
+    //->setFormClass('anonymous_enroll', 'Drupal\social_event_an_enroll_extras\Form\EventAnEnrollFormExtras');
+
+  //kint($entity_types['event_enrollment']->getFormClass());
+}
+
+/**
+ * Implements hook_form_alter()
+ */
+function social_event_an_enroll_extras_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  // We want required fields for enroll dialog
+  if ($form_id === 'event_an_enroll_form') {
+
+    // For later we can access a form mode and get the available fields from there
+    //$entity_form_display = \Drupal::service('entity_type.manager')->getStorage('entity_form_display');
+    //$entity_form_content = $entity_form_display->load('event_enrollment.event_enrollment.anonymous_enroll');
+    
+    $countries = _social_event_an_enroll_extras_get_standard_country_list();
+
+    // Please change fields to yours!
+    $form['field_country'] = [
+      '#type' => 'select',
+      '#title' => t('Country'),
+      '#options' => $countries,
+      '#weight' => 0,
+      '#required' => TRUE,
+    ];
+
+    $form['field_municipality'] = [
+      '#type' => 'textfield',
+      '#title' => t('Organisation / Municipality'),
+      '#weight' => 0,
+      '#required' => TRUE,
+    ];
+
+  }
+
+
+}
+
+function _social_event_an_enroll_extras_get_allowed_values($field_name) {
+
+  $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('event_enrollment','event_enrollment');
+  if (isset($field_definitions[$field_name])) {
+
+    $allowed_values = $field_definitions[$field_name]->getSetting('allowed_values');
+    return $allowed_values;
+
+  }
+
+  return FALSE;
+
+}
+
+function _social_event_an_enroll_extras_get_field_label($field_name) {
+  $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('event_enrollment','event_enrollment');
+  if (isset($field_definitions[$field_name])) {
+
+    $label = $field_definitions[$field_name]->getLabel();
+    return $label;
+
+  }
+
+  return FALSE;
+}
+
+function _social_event_an_enroll_extras_get_allowed_countries($field_name) {
+
+  $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('event_enrollment','event_enrollment');
+  if (isset($field_definitions[$field_name])) {
+
+    $allowed_values = $field_definitions[$field_name]->getSetting('available_countries');
+    if (empty($allowed_values)) {
+      $allowed_values = _social_event_an_enroll_extras_get_standard_country_list();
+    }
+    return $allowed_values;
+
+  }
+
+  return FALSE;
+
+}
+
+function _social_event_an_enroll_extras_get_standard_country_list() {
+
+  $country_manager = \Drupal::service('country_manager');
+  $list = $country_manager->getList();
+  $countries = [];
+  foreach ($list as $key => $value) {
+    $val = $value->__toString();
+    $countries[$key] = $val;
+  }
+  
+  return $countries;
+
+}
+
+
+
+

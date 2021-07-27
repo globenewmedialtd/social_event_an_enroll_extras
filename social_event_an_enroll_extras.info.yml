@@ -1,0 +1,7 @@
+name: 'Social Event Anonymous Enroll Extras'
+type: module
+description: 'Adds improvements to Social Event Anonymous Enroll'
+core: 8.x
+package: 'Social'
+dependencies:
+  - social:social_event_an_enroll
