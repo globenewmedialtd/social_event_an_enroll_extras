@@ -34,7 +34,7 @@ function social_event_an_enroll_extras_form_alter(&$form, FormStateInterface $fo
     $countries = _social_event_an_enroll_extras_get_standard_country_list();
 
     // Please change fields to yours!
-    $form['field_country'] = [
+    $form['field_ee_country'] = [
       '#type' => 'select',
       '#title' => t('Country'),
       '#options' => $countries,
@@ -42,15 +42,46 @@ function social_event_an_enroll_extras_form_alter(&$form, FormStateInterface $fo
       '#required' => TRUE,
     ];
 
-    $form['field_municipality'] = [
-      '#type' => 'textfield',
+    $form['field_ee_orga_municipality'] = [
+      '#type' => 'entity_autocomplete',
+      '#target_type' => 'taxonomy_term',
+      '#selection_settings' => [
+        'target_bundles' => array('municipalities'),
+      ],
       '#title' => t('Organisation / Municipality'),
       '#weight' => 0,
       '#required' => TRUE,
+      '#autocreate' => [
+        'bundle' => 'municipalities', // Required. The bundle name for the new entity.
+        //'uid' => 1, // Optional. The user ID for the new entity
+      ],
     ];
+
+
 
   }
 
+
+}
+
+function _social_event_an_enroll_extras_get_taxonomy() {
+
+  $query = \Drupal::entityQuery('taxonomy_term');
+  $query->condition('vid', 'municipalities');
+  $tids = $query->execute();
+  
+  $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
+    'vid' => 'municipalities',
+  ]);
+  
+
+
+  //$terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadMultiple($tids);
+  //foreach ($terms as $term) {
+    //$options[$term->id()] = $term->name();
+  //}
+
+  return $terms; 
 
 }
 
